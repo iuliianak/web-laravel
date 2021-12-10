@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/',[\App\Http\Controllers\HomeController::class,'index'])->name('index');
+
+Route::name('user.')->group(function(){
+    Route::prefix('/user')->group(function(Illuminate\Routing\Router $router){
+    Route::post('/create',[\App\Http\Controllers\UsersController::class,'create'])->name('create');
+    Route::post('/auth',[\App\Http\Controllers\UsersController::class,'auth'])->name('auth');
+    Route::get('/show/{id}',[\App\Http\Controllers\UsersController::class,'show'])->name('show');
+    Route::delete('/delete/{id}',[\App\Http\Controllers\UsersController::class,'delete'])->name('delete');
+    });
 });
+
+
+Route::resource('tasks',\App\Http\Controllers\TaskController::class);
+
