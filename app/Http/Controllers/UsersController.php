@@ -2,10 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+
 class UsersController
 {
     public function create()
     {
+        /*
+        $user = new User();
+        $user->name = 'admin';
+        $user->email = 'admin@mail.ru';
+        $user->password = md5('password');
+        $user->save();
+        */
         return 'Регистрация нового пользователя';
     }
 
