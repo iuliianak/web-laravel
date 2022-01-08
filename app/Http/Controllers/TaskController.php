@@ -73,8 +73,29 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response|string
      */
-    public function edit($id)
+    public function edit(HistoryTask $historytask,$id)
     {
+
+          $arr = [
+              'creator_id' => 1,
+              'title' => 'Task2',
+              'content' => 'User must do Something2',
+              'status_id' => 2,
+              'updated_at' => date("Y-m-d H:i:s")
+          ];
+
+               $task->id = $id;
+               $task->title = $arr['title'];
+               $task->creator_id = $arr['creator_id'];
+               $task->content = $arr['content'];
+               $task->status_id = $arr['status_id'];
+               $task->updated_at = $arr['updated_at'];
+               $task->created_at = $arr['updated_at'];
+               $task->save();
+               $historytask->saveHistoryTask($task->id, $arr);
+
+
+
         return 'Форма редактирования задания id = ' . $id;
     }
 
@@ -85,7 +106,7 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response|string
      */
-    public function update(Request $request, $id)
+    public function update(Request $request,)
     {
         return 'Задание ' . $id . ' успешно изменилось';
     }
