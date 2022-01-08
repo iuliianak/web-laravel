@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
+use App\Service\HistoryTask\HistoryTask;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -21,8 +23,24 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response|string
      */
-    public function create()
+    public function create(HistoryTask $historytask)
     {
+        $arr = [
+            'creator_id' => 1,
+            'title' => 'Task1',
+            'content' => 'User must do Something',
+            'status_id' => 1,
+            'updated_at' => date("Y-m-d H:i:s")
+        ];
+        $task = new Task();
+        $task->title = $arr['title'];
+        $task->creator_id = $arr['creator_id'];
+        $task->content = $arr['content'];
+        $task->status_id = $arr['status_id'];
+        $task->updated_at = $arr['updated_at'];
+        $task->created_at = $arr['updated_at'];
+        $task->save();
+        $historytask->saveHistoryTask($task->id, $arr);
         return 'Форма добавления задания';
     }
 
@@ -34,6 +52,7 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+
         return 'Сохранение задания';
     }
 
