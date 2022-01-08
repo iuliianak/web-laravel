@@ -10,4 +10,8 @@ class Status extends Model
     {
         return $this->hasMany(Task::class);
     }
+    public function taskshistory()
+    {
+        return $this->hasMany(TasksHistory::class);
+    }
 }
