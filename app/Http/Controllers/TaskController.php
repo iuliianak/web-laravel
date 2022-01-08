@@ -15,7 +15,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return 'Список всех заданий';
+              return 'Список всех заданий';
     }
 
     /**
@@ -41,6 +41,7 @@ class TaskController extends Controller
         $task->created_at = $arr['updated_at'];
         $task->save();
         $historytask->saveHistoryTask($task->id, $arr);
+       // \App\Service\HistoryTask\Facade\HistoryTask::saveHistoryTask($task->id,$arr);
         return 'Форма добавления задания';
     }
 
