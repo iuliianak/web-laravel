@@ -26,7 +26,7 @@ Route::name('user.')->group(function(){
 });
 
 
-Route::resource('tasks',\App\Http\Controllers\TaskController::class);
-Route::get('tasks/create',[\App\Http\Controllers\TaskController::class,'create']);
-Route::get('tasks/edit',[\App\Http\Controllers\TaskController::class,'edit']);
+Route::resource('/tasks',\App\Http\Controllers\TaskController::class);
+Route::get('/tasks/create',[\App\Http\Controllers\TaskController::class,'create']);
+Route::get('/tasks/edit/{task}',[\App\Http\Controllers\TaskController::class,'edit'])->name('edit');
 
