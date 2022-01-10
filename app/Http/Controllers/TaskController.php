@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Status;
 use App\Models\Task;
+use App\Models\User;
 use App\Service\HistoryTask\HistoryTask;
 use Illuminate\Http\Request;
+use function GuzzleHttp\Promise\all;
 
 class TaskController extends Controller
 {
@@ -15,7 +18,12 @@ class TaskController extends Controller
      */
     public function index()
     {
-              return 'Список всех заданий';
+        $tasks = Task::query()->
+        select('title', 'content','tasks.created_at','tasks.id','name')->
+        Join('users','creator_id','=','users.id')->get();
+                  return view('tasks-list',[
+                  'tasks'=>$tasks
+              ]);
     }
 
     /**
@@ -23,26 +31,10 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response|string
      */
-    public function create(HistoryTask $historytask)
+    public function create()
     {
-        $arr = [
-            'creator_id' => 1,
-            'title' => 'Task1',
-            'content' => 'User must do Something',
-            'status_id' => 1,
-            'updated_at' => date("Y-m-d H:i:s")
-        ];
-        $task = new Task();
-        $task->title = $arr['title'];
-        $task->creator_id = $arr['creator_id'];
-        $task->content = $arr['content'];
-        $task->status_id = $arr['status_id'];
-        $task->updated_at = $arr['updated_at'];
-        $task->created_at = $arr['updated_at'];
-        $task->save();
-        $historytask->saveHistoryTask($task->id, $arr);
-       // \App\Service\HistoryTask\Facade\HistoryTask::saveHistoryTask($task->id,$arr);
-        return 'Форма добавления задания';
+        $users=User::query()->get();
+        return view('task-form',['users' => $users]) ;
     }
 
     /**
@@ -51,10 +43,26 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response|string
      */
-    public function store(Request $request)
+    public function store(HistoryTask $historytask,Request $request)
     {
+        $request->validate([
+                'title' => 'required|string|max:100|min:5',
+                'content' => 'required|string|max:1000|min:5',
+                'user_id' => 'required|numeric|max:20'
+        ]);
+        $date = date("Y-m-d H:i:s");
+        $task = new Task();
+        $task->title = $request->post('title');
+        $task->creator_id = $request->post('user_id');
+        $task->content = $request->post('content');
+        $task->status_id = 1;
+        $task->updated_at = $date;
+        $task->created_at = $date;
+        $task->save();
+        $historytask->saveHistoryTask($task->id, $task);
+        // \App\Service\HistoryTask\Facade\HistoryTask::saveHistoryTask($task->id,$arr);
+        return redirect(route('tasks.index'));;
 
-        return 'Сохранение задания';
     }
 
     /**
@@ -74,30 +82,16 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response|string
      */
-    public function edit(HistoryTask $historytask,$id)
+    public function edit($id)
     {
-
-          $arr = [
-              'creator_id' => 1,
-              'title' => 'Task2',
-              'content' => 'User must do Something2',
-              'status_id' => 2,
-              'updated_at' => date("Y-m-d H:i:s")
-          ];
-
-               $task->id = $id;
-               $task->title = $arr['title'];
-               $task->creator_id = $arr['creator_id'];
-               $task->content = $arr['content'];
-               $task->status_id = $arr['status_id'];
-               $task->updated_at = $arr['updated_at'];
-               $task->created_at = $arr['updated_at'];
-               $task->save();
-               $historytask->saveHistoryTask($task->id, $arr);
-
-
-
-        return 'Форма редактирования задания id = ' . $id;
+        $users = User::query()->get();
+        $statuses = Status::query()->get();
+        $task = Task::query()->where('id',$id)->first();
+        return view('edit-task-form',[
+            'users' => $users,
+            'statuses' => $statuses,
+            'task' => $task
+        ]) ;
     }
 
     /**
@@ -107,9 +101,24 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response|string
      */
-    public function update(Request $request,)
+    public function update(HistoryTask $historytask,Request $request,$id)
     {
-        return 'Задание ' . $id . ' успешно изменилось';
+        $request->validate([
+            'title' => 'required|string|max:100|min:5',
+            'content' => 'required|string|max:1000|min:5',
+            'user_id' => 'required|numeric|max:20',
+            'status_id' => 'required|numeric|max:3'
+        ]);
+        $task = Task::query()->where('id',$id)->first();
+        $task->title = $request->post('title');
+        $task->creator_id = $request->post('user_id');
+        $task->content = $request->post('content');
+        $task->status_id = $request->post('status_id');
+        $task->updated_at =  date("Y-m-d H:i:s");
+        $task->save();
+        $historytask->saveHistoryTask($id, $task);
+        // \App\Service\HistoryTask\Facade\HistoryTask::saveHistoryTask($task->id,$arr);
+        return redirect(route('tasks.index'));;
     }
 
     /**
